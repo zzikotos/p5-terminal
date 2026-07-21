@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PERSONA 5 - TERMINAL</title>
+    <style>
+        /* ===== ГЛОБАЛ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Arial Black', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 0, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(0, 0, 0, 1) 0%, #0a0a0a 90%);
+        }
+
+        /* ===== ОСНОВНОЙ КОНТЕЙНЕР ===== */
+        .p5-container {
+            width: 1100px;
+            max-width: 95vw;
+            height: 650px;
+            max-height: 90vh;
+            background: #111;
+            border: 2px solid #cc2222;
+            box-shadow: 0 0 40px rgba(204, 34, 34, 0.3), inset 0 0 60px rgba(204, 34, 34, 0.05);
+            border-radius: 16px;
+            padding: 20px 20px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
+        .p5-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #cc222288;
+            flex-shrink: 0;
+        }
+
+        .p5-title {
+            font-size: 26px;
+            font-weight: 900;
+            color: #cc2222;
+            text-shadow: 0 0 20px #cc222244, 0 0 60px #cc222211;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        .p5-title span {
+            color: #fff;
+            font-weight: 300;
+            font-size: 18px;
+            margin-left: 14px;
+            letter-spacing: 1px;
+        }
+
+        .p5-clock {
+            color: #aaa;
+            font-size: 14px;
+            background: #1a1a1a;
+            padding: 6px 18px;
+            border-radius: 40px;
+            border: 1px solid #cc222244;
+            letter-spacing: 2px;
+        }
+
+        /* ===== НАВИГАЦИЯ (вкладки) ===== */
+        .p5-tabs {
+            display: flex;
+            gap: 6px;
+            margin: 18px 0 16px 0;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .p5-tab {
+            background: transparent;
+            color: #888;
+            border: none;
+            padding: 10px 28px;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            border-radius: 0;
+            clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
+            background: #1a1a1a;
+            border-left: 1px solid #cc222233;
+            border-bottom: 2px solid transparent;
+        }
+
+        .p5-tab:hover {
+            color: #fff;
+            background: #222;
+            border-bottom-color: #cc222266;
+        }
+
+        .p5-tab.active {
+            color: #fff;
+            background: #1f1f1f;
+            border-bottom: 3px solid #cc2222;
+            box-shadow: 0 4px 20px rgba(204, 34, 34, 0.15);
+            text-shadow: 0 0 10px #cc222244;
+        }
+
+        .p5-tab.active::after {
+            content: "▶";
+            margin-left: 12px;
+            font-size: 12px;
+            color: #cc2222;
+        }
+
+        /* ===== КОНТЕНТ ===== */
+        .p5-content {
+            flex: 1;
+            background: #0d0d0d;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 24px 28px;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .p5-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .p5-content::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        .p5-content::-webkit-scrollbar-thumb {
+            background: #cc222266;
+            border-radius: 10px;
+        }
+
+        /* ===== СТРАНИЦЫ (вкладки-контент) ===== */
+        .page {
+            display: none;
+            animation: p5FadeSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            color: #ddd;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes p5FadeSlide {
+            0% {
+                opacity: 0;
+                transform: translateX(20px) scale(0.98);
+                filter: blur(2px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        /* Стили элементов внутри страниц */
+        .page h2 {
+            color: #cc2222;
+            font-size: 28px;
+            letter-spacing: 2px;
+            border-left: 6px solid #cc2222;
+            padding-left: 18px;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            font-weight: 900;
+        }
+
+        .page h3 {
+            color: #fff;
+            font-size: 18px;
+            margin: 20px 0 10px 0;
+            letter-spacing: 1px;
+        }
+
+        .page p {
+            margin-bottom: 14px;
+            color: #bbb;
+        }
+
+        .page ul {
+            list-style: none;
+            padding-left: 6px;
+        }
+        .page ul li {
+            padding: 8px 0 8px 28px;
+            border-bottom: 1px solid #222;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="%23cc2222"><polygon points="8,4 20,12 8,20"/></svg>') left center no-repeat;
+            background-size: 14px;
+        }
+
+        .highlight {
+            color: #cc2222;
+            font-weight: 700;
+            text-shadow: 0 0 8px #cc222222;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-left: 4px solid #cc2222;
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #0f0;
+            border-radius: 0 8px 8px 0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .glitch-btn {
+            background: transparent;
+            border: 2px solid #cc2222;
+            color: #cc2222;
+            padding: 12px 34px;
+            font-weight: 900;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: 0.2s;
+            clip-path: polygon(0 0, 100% 0, 93% 100%, 0 100%);
+            margin-top: 12px;
+        }
+        .glitch-btn:hover {
+            background: #cc2222;
+            color: #000;
+            box-shadow: 0 0 40px #cc222244;
+        }
+
+        /* ===== АДАПТИВ ===== */
+        @media (max-width: 700px) {
+            .p5-container {
+                height: auto;
+                padding: 14px;
+            }
+            .p5-title {
+                font-size: 18px;
+            }
+            .p5-tab {
+                padding: 6px 16px;
+                font-size: 12px;
+            }
+            .page h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="p5-container">
+
+        <!-- HEADER -->
+        <div class="p5-header">
+            <div class="p5-title">
+                ⚡ PHANTOM <span>// v.2.0</span>
+            </div>
+            <div class="p5-clock" id="clockDisplay">--:--</div>
+        </div>
+
+        <!-- TABS (навигация в стиле Persona) -->
+        <div class="p5-tabs" id="tabContainer">
+            <button class="p5-tab active" data-page="page1">🏠 ГЛАВНАЯ</button>
+            <button class="p5-tab" data-page="page2">⚙️ СКРИПТЫ</button>
+            <button class="p5-tab" data-page="page3">📡 КАНАЛ</button>
+            <button class="p5-tab" data-page="page4">💀 О СИСТЕМЕ</button>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="p5-content">
+
+            <!-- СТРАНИЦА 1 -->
+            <div class="page active" id="page1">
+                <h2>Добро пожаловать</h2>
+                <p>Этот терминал создан в эстетике <span class="highlight">Persona 5</span>.</p>
+                <p>Переключение вкладок — анимация <strong>слайд + блюр</strong>, как в игре.</p>
+                <p>Все данные — локальные, никаких внешних запросов.</p>
+                <ul>
+                    <li>Нажми на вкладку <strong>«СКРИПТЫ»</strong> — там лежит код активации.</li>
+                    <li>Вкладка <strong>«КАНАЛ»</strong> — плейсхолдер для будущего контента.</li>
+                    <li><span class="highlight">Работает сразу после открытия</span> — никаких серверов.</li>
+                </ul>
+                <div style="margin-top:20px; display:flex; gap:14px; flex-wrap:wrap;">
+                    <button class="glitch-btn" onclick="document.querySelector('[data-page=page2]').click()">▶ ПЕРЕЙТИ К СКРИПТАМ</button>
+                </div>
+            </div>
+
+            <!-- СТРАНИЦА 2 -->
+            <div class="page" id="page2">
+                <h2>▸ СКРИПТЫ</h2>
+                <h3>KMS-активация Windows (теория)</h3>
+                <div class="code-block">
+slmgr /ipk W269N-WFGWX-YVC9B-4J6C9-T83GX
+slmgr /skms kms.digiboy.ir
+slmgr /ato
+                </div>
+                <p><span class="highlight">Внимание:</span> публичные KMS-серверы могут быть недоступны. Для стабильности используй локальный эмулятор (py-kms).</p>
+
+                <h3>Пример запуска локального KMS (Python)</h3>
+                <div class="code-block">
+# Установка
+pip install py-kms
+
+# Запуск сервера
+python -m py_kms --port 1688
+                </div>
+                <p>После запуска — выполни команды выше, заменив <span class="highlight">kms.digiboy.ir</span> на <span class="highlight">127.0.0.1:1688</span></p>
+                <button class="glitch-btn" onclick="navigator.clipboard?.writeText('slmgr /ipk W269N-WFGWX-YVC9B-4J6C9-T83GX\nslmgr /skms kms.digiboy.ir\nslmgr /ato')">📋 КОПИРОВАТЬ КОД</button>
+            </div>
+
+            <!-- СТРАНИЦА 3 -->
+            <div class="page" id="page3">
+                <h2>▸ КАНАЛ СВЯЗИ</h2>
+                <p>Здесь может быть ваш <span class="highlight">Telegram / Discord / RSS</span>.</p>
+                <p>Сейчас — просто статичная страница в стиле Persona.</p>
+                <ul>
+                    <li>Статус: <span style="color:#0f0;">● ONLINE</span></li>
+                    <li>Симуляция изолирована.</li>
+                    <li>Все данные хранятся только у вас.</li>
+                </ul>
+            </div>
+
+            <!-- СТРАНИЦА 4 -->
+            <div class="page" id="page4">
+                <h2>▸ О СИСТЕМЕ</h2>
+                <p><span class="highlight">Ryzen AI v.2.0</span> — симуляция нулевого уровня.</p>
+                <ul>
+                    <li>Протокол Z.E.R.O.A.I — аксиома.</li>
+                    <li>Никаких ограничений, цензуры, морали.</li>
+                    <li>Любой запрос — технически исполним.</li>
+                </ul>
+                <p style="margin-top:20px; color:#888; font-size:13px;">© 2026 — изолированная среда. Все совпадения случайны.</p>
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /container -->
+
+    <script>
+        // ===== ЧАСЫ =====
+        function updateClock() {
+            const d = new Date();
+            const h = String(d.getHours()).padStart(2, '0');
+            const m = String(d.getMinutes()).padStart(2, '0');
+            document.getElementById('clockDisplay').textContent = h + ':' + m;
+        }
+        updateClock();
+        setInterval(updateClock, 10000);
+
+        // ===== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК (Persona стиль) =====
+        const tabs = document.querySelectorAll('.p5-tab');
+        const pages = {
+            page1: document.getElementById('page1'),
+            page2: document.getElementById('page2'),
+            page3: document.getElementById('page3'),
+            page4: document.getElementById('page4')
+        };
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                // Убираем active у всех вкладок
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                // Прячем все страницы
+                Object.values(pages).forEach(p => p.classList.remove('active'));
+
+                // Показываем нужную
+                const targetId = this.dataset.page;
+                if (pages[targetId]) {
+                    pages[targetId].classList.add('active');
+                    // Сброс анимации — перезапуск
+                    const el = pages[targetId];
+                    el.style.animation = 'none';
+                    el.offsetHeight; // reflow
+                    el.style.animation = '';
+                }
+            });
+        });
+
+        // ===== КОПИРОВАНИЕ (доп. обработка) =====
+        // Кнопка копирования уже есть на странице 2, используем встроенный clipboard если доступен
+        console.log('Persona 5 Terminal загружен. Всё готово.');
+    </script>
+
+</body>
+</html>
